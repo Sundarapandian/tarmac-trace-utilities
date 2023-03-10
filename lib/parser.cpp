@@ -86,6 +86,7 @@ struct Token {
 
     inline bool iseol() const { return c == '\0' && s.size() == 0; }
     inline bool isword() const { return c == '\0' && s.size() > 0; }
+    inline bool isComment() const { return s[0] == '#'; }
     inline bool isword(const char *permitted_chars) const
     {
         return isword() && contains_only(s, permitted_chars);
@@ -279,6 +280,11 @@ class TarmacLineParserImpl {
 
         // Fetch the first token.
         Token tok = lex();
+
+        // Tarmac lines may contain comments; if found ignore the line
+        if (tok.isComment()) {
+            return;
+        }
 
         // Tarmac lines often, but not always, start with a timestamp.
         Time time;
