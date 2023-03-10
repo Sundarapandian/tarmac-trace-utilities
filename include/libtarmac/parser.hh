@@ -132,7 +132,7 @@ class TarmacLineParser {
     TarmacLineParserImpl *pImpl;
 
   public:
-    TarmacLineParser(bool bigend, ParseReceiver &);
+    TarmacLineParser(bool bigend, ParseReceiver &, bool cortexm = true);
     ~TarmacLineParser();
     void parse(const std::string &s) const;
 };

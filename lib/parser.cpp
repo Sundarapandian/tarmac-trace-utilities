@@ -158,6 +158,7 @@ class TarmacLineParserImpl {
     size_t pos, size;
     Time last_timestamp;
     bool bigend;
+    bool cortexm;
     set<string> unrecognised_registers_already_reported;
     set<string> unrecognised_system_operations_reported;
     set<string> unrecognised_tarmac_events_reported;
@@ -492,12 +493,16 @@ class TarmacLineParserImpl {
             // Now we reconverge, because both ES and IT formats
             // look basically the same from here on.
             ISet iset;
-            if (!parse_iset_state(tok, &iset))
-                parse_error(tok, "expected instruction-set state");
-            highlight(tok, HL_ISET);
-            if (tok == "T16" || tok == "T32")
-                t16_t32_state = true;
-            tok = lex();
+            if (cortexm == false) {
+                if (!parse_iset_state(tok, &iset))
+                    parse_error(tok, "expected instruction-set state");
+                highlight(tok, HL_ISET);
+                if (tok == "T16" || tok == "T32")
+                    t16_t32_state = true;
+                tok = lex();
+            } else {
+                iset = THUMB;
+            }
 
             // Heuristically guess whether we expect to see a CPU mode token,
             // and its following colon, in this record.
@@ -513,7 +518,7 @@ class TarmacLineParserImpl {
             if (!is_ES && seen_colon_in_brackets && t16_t32_state)
                 expect_cpu_mode = false;
 
-            if (expect_cpu_mode) {
+            if (expect_cpu_mode && cortexm == false) {
                 if (!tok.isword())
                     parse_error(tok, "expected CPU mode");
                 // We currently ignore the CPU mode. If we ever needed to
@@ -1066,10 +1071,11 @@ class TarmacLineParserImpl {
     }
 };
 
-TarmacLineParser::TarmacLineParser(bool bigend, ParseReceiver &rec)
+TarmacLineParser::TarmacLineParser(bool bigend, ParseReceiver &rec, bool cortexm)
     : pImpl(new TarmacLineParserImpl)
 {
     pImpl->bigend = bigend;
+    pImpl->cortexm = cortexm;
     pImpl->receiver = &rec;
 
     /*

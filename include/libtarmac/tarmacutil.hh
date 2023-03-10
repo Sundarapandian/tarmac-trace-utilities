@@ -45,6 +45,7 @@ class TarmacUtilityBase {
 
     bool only_index() const { return onlyIndex; }
     bool is_verbose() const { return verbose; }
+    bool is_cortexm() const { return cortexm; }
 
     std::string image_filename;
 
@@ -57,11 +58,12 @@ class TarmacUtilityBase {
     bool bigend_explicit = false;
     bool bigend = false;
     bool verbose;
+    bool cortexm;
     bool show_progress_meter;
 
     static void updateIndexIfNeeded(const TracePair &trace, Troolean doIndexing,
                                     bool bigend, bool verbose,
-                                    bool show_progress_meter);
+                                    bool show_progress_meter, bool cortexm);
 
   private:
     // Subclass-dependent functionality.
@@ -84,7 +86,7 @@ struct TarmacUtility : public TarmacUtilityBase {
     virtual void setupIndex() const override
     {
         TarmacUtilityBase::updateIndexIfNeeded(trace, indexing, bigend, verbose,
-                                               show_progress_meter);
+                                               show_progress_meter, cortexm);
     }
 };
 
@@ -101,7 +103,7 @@ struct TarmacUtilityMT : public TarmacUtilityBase {
     {
         for (const TracePair &trace : traces)
             TarmacUtilityBase::updateIndexIfNeeded(
-                trace, indexing, bigend, verbose, show_progress_meter);
+                trace, indexing, bigend, verbose, show_progress_meter, cortexm);
     }
 };
 
