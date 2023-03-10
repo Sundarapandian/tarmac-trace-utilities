@@ -65,7 +65,7 @@ static bool contains_only(const std::string &str, const char *permitted_chars)
 }
 
 struct Token {
-    static constexpr const char *decimal_digits = "0123456789";
+    static constexpr const char *decimal_digits = "0123456789.";
     static constexpr const char *hex_digits = "0123456789ABCDEFabcdef";
     static constexpr const char *regvalue_chars = "0123456789ABCDEFabcdef_-";
 
